@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import WorkflowSVG from '../assets/workflow.svg';
 import VerifyButton from '../components/VerifyButton.astro';
-import { samples } from '../data/samples.js';
+import { samples, type Sample } from '../data/samples.ts';
 ---
 
 <Layout>
@@ -70,9 +70,9 @@ import { samples } from '../data/samples.js';
               </tr>
             </thead>
             <tbody>
-              {samples.map((sample, sampleIndex) => (
-                ["3", "2", "1", "-1", "-2", "-3"].map((semitone, semitoneIndex) => (
-                  <tr key={`${sampleIndex}-${semitone}`} class="hover:bg-gray-50 border-b border-gray-200">
+              {samples.map((sample: Sample, sampleIndex: number) => (
+                (["3", "2", "1", "-1", "-2", "-3"] as const).map((semitone, semitoneIndex: number) => (
+                  <tr class="hover:bg-gray-50 border-b border-gray-200">
                     {semitoneIndex === 0 && (
                       <td rowspan="6" class="px-4 py-3 text-sm text-gray-700 max-w-xs">
                         {sample.transcript}
@@ -91,19 +91,19 @@ import { samples } from '../data/samples.js';
                     </td>
                     <td class="px-2 py-3 text-center">
                       <audio controls class="w-24 h-6">
-                        <source src={`/audio/${sample.anonymizedSpeech[semitone].f32}`} type="audio/wav" />
+                        <source src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech].f32}`} type="audio/wav" />
                         Your browser does not support the audio element.
                       </audio>
                     </td>
                     <td class="px-2 py-3 text-center">
                       <audio controls class="w-24 h-6">
-                        <source src={`/audio/${sample.anonymizedSpeech[semitone].m32}`} type="audio/wav" />
+                        <source src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech].m32}`} type="audio/wav" />
                         Your browser does not support the audio element.
                       </audio>
                     </td>
                     <td class="px-2 py-3 text-center">
                       <audio controls class="w-24 h-6">
-                        <source src={`/audio/${sample.anonymizedSpeech[semitone].m377}`} type="audio/wav" />
+                        <source src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech].m377}`} type="audio/wav" />
                         Your browser does not support the audio element.
                       </audio>
                     </td>
@@ -111,7 +111,7 @@ import { samples } from '../data/samples.js';
                       <VerifyButton 
                         proofId={`sample${sampleIndex + 1}_${semitone}_m377`}
                         downloadUrl={`/proofs/sample${sampleIndex + 1}_${semitone}_m377_proof.bin`}
-                        fileSize={sample.proof[semitone].size}
+                        fileSize={sample.proof[semitone as keyof typeof sample.proof].size}
                       />
                     </td>
                   </tr>

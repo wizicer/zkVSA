@@ -20,10 +20,12 @@ const { proofId, downloadUrl, fileSize } = Astro.props;
 </div>
 
 <script>
-  function verifyProof(proofId) {
+  function verifyProof(proofId: string) {
     // Get the button element to show loading state
-    const button = event.target;
-    const originalText = button.textContent;
+    const button = event?.target as HTMLButtonElement;
+    if (!button) return;
+    
+    const originalText = button.textContent || '';
     
     // Show loading state
     button.textContent = 'Verifying...';
@@ -61,7 +63,7 @@ const { proofId, downloadUrl, fileSize } = Astro.props;
     }, 1500);
   }
   
-  function showNotification(message, type) {
+  function showNotification(message: string, type: 'success' | 'error') {
     // Create notification element
     const notification = document.createElement('div');
     notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 transition-all duration-300 ${
@@ -77,7 +79,9 @@ const { proofId, downloadUrl, fileSize } = Astro.props;
       notification.style.opacity = '0';
       notification.style.transform = 'translateX(100%)';
       setTimeout(() => {
-        document.body.removeChild(notification);
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
       }, 300);
     }, 3000);
   }
@@ -89,7 +93,9 @@ const { proofId, downloadUrl, fileSize } = Astro.props;
     verifyButtons.forEach((button) => {
       button.addEventListener('click', (event) => {
         const proofId = button.getAttribute('data-proof-id');
-        verifyProof(proofId);
+        if (proofId) {
+          verifyProof(proofId);
+        }
       });
     });
   });
