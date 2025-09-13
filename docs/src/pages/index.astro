@@ -2,7 +2,11 @@
 import Layout from '../layouts/Layout.astro';
 import WorkflowSVG from '../assets/workflow.svg';
 import VerifyButton from '../components/VerifyButton.astro';
-import { samples, type Sample } from '../data/samples.ts';
+import samplesData from '../data/samples.json';
+import type { Sample } from '../data/types.ts';
+
+// Type the imported JSON data
+const samples: Sample[] = samplesData as Sample[];
 ---
 
 <Layout>
