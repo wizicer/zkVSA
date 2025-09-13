@@ -3,9 +3,10 @@ export interface Props {
   proofId: string;
   downloadUrl: string;
   fileSize: string;
+  disabled?: boolean;
 }
 
-const { proofId, downloadUrl, fileSize } = Astro.props;
+const { proofId, downloadUrl, fileSize, disabled = false } = Astro.props;
 ---
 
 <div class="flex flex-col items-center space-y-1">
@@ -14,16 +15,24 @@ const { proofId, downloadUrl, fileSize } = Astro.props;
     proof.bin ({fileSize})
   </a>
   <button data-verify-button data-proof-id={proofId}
-          class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+          disabled={disabled}
+          class={`px-3 py-1 text-white text-xs rounded transition-colors ${
+            disabled 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+          title={disabled ? 'Must load verifier first to verify' : ''}>
     Verify
   </button>
 </div>
 
 <script>
+  import { showNotification } from '../utils/notifications.ts';
+
   function verifyProof(proofId: string) {
     // Get the button element to show loading state
     const button = event?.target as HTMLButtonElement;
-    if (!button) return;
+    if (!button || button.disabled) return;
     
     const originalText = button.textContent || '';
     
@@ -61,29 +70,6 @@ const { proofId, downloadUrl, fileSize } = Astro.props;
         button.classList.add('bg-blue-600', 'hover:bg-blue-700');
       }, 3000);
     }, 1500);
-  }
-  
-  function showNotification(message: string, type: 'success' | 'error') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 transition-all duration-300 ${
-      type === 'success' ? 'bg-green-500' : 'bg-red-500'
-    }`;
-    notification.textContent = message;
-    
-    // Add to page
-    document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      notification.style.transform = 'translateX(100%)';
-      setTimeout(() => {
-        if (document.body.contains(notification)) {
-          document.body.removeChild(notification);
-        }
-      }, 300);
-    }, 3000);
   }
 
   // Find all verify buttons and add event listeners

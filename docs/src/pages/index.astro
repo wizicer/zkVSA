@@ -7,6 +7,9 @@ import type { Sample } from '../data/types.ts';
 
 // Type the imported JSON data
 const samples: Sample[] = samplesData as Sample[];
+
+// Verifier state
+let isVerifierLoaded = false;
 ---
 
 <Layout>
@@ -65,7 +68,15 @@ const samples: Sample[] = samplesData as Sample[];
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Original Speech</th>
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Semitone</th>
                 <th colspan="3" class="px-4 py-3 text-center font-semibold text-gray-800">Anonymized Speech</th>
-                <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Proof (m377)</th>
+                <th class="px-4 py-3 text-center font-semibold text-gray-800">
+                  <div class="flex flex-col items-center space-y-2">
+                    <span>Proof (m377)</span>
+                    <button id="load-verifier-btn" 
+                            class="px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors">
+                      Load Verifier
+                    </button>
+                  </div>
+                </th>
               </tr>
               <tr class="bg-gray-100 border-b border-gray-300">
                 <th class="px-2 py-2 text-center font-medium text-gray-700">f32</th>
@@ -116,6 +127,7 @@ const samples: Sample[] = samplesData as Sample[];
                         proofId={`sample${sampleIndex + 1}_${semitone}_m377`}
                         downloadUrl={`/proofs/sample${sampleIndex + 1}_${semitone}_m377_proof.bin`}
                         fileSize={sample.proof[semitone as keyof typeof sample.proof].size}
+                        disabled={!isVerifierLoaded}
                       />
                     </td>
                   </tr>
@@ -136,4 +148,65 @@ const samples: Sample[] = samplesData as Sample[];
     height: 20px;
   }
 </style>
+
+<script>
+  import { showNotification } from '../utils/notifications.ts';
+
+  // Global verifier state
+  let isVerifierLoaded = false;
+
+  // Load verifier function
+  async function loadVerifier() {
+    const loadBtn = document.getElementById('load-verifier-btn') as HTMLButtonElement;
+    if (!loadBtn) return;
+
+    // Show loading state
+    loadBtn.textContent = 'Loading...';
+    loadBtn.disabled = true;
+    loadBtn.classList.remove('bg-orange-600', 'hover:bg-orange-700');
+    loadBtn.classList.add('bg-orange-500');
+
+    try {
+      // Simulate loading the 13MB verifier
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Mark verifier as loaded
+      isVerifierLoaded = true;
+      
+      // Update button state
+      loadBtn.textContent = '✓ Verifier Loaded';
+      loadBtn.classList.remove('bg-orange-500');
+      loadBtn.classList.add('bg-green-600');
+      
+      // Enable all verify buttons
+      const verifyButtons = document.querySelectorAll('[data-verify-button]') as NodeListOf<HTMLButtonElement>;
+      verifyButtons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove('bg-gray-400', 'cursor-not-allowed');
+        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        button.title = '';
+      });
+
+      // Show success notification
+      showNotification('Verifier loaded successfully! You can now verify proofs.', 'success');
+      
+    } catch (error) {
+      // Handle error
+      loadBtn.textContent = 'Load Verifier';
+      loadBtn.disabled = false;
+      loadBtn.classList.remove('bg-orange-500');
+      loadBtn.classList.add('bg-orange-600', 'hover:bg-orange-700');
+      
+      showNotification('Failed to load verifier. Please try again.', 'error');
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    const loadBtn = document.getElementById('load-verifier-btn');
+    if (loadBtn) {
+      loadBtn.addEventListener('click', loadVerifier);
+    }
+  });
+</script>
 
