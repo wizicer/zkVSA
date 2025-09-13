@@ -1,0 +1,96 @@
+---
+export interface Props {
+  proofId: string;
+  downloadUrl: string;
+  fileSize: string;
+}
+
+const { proofId, downloadUrl, fileSize } = Astro.props;
+---
+
+<div class="flex flex-col items-center space-y-1">
+  <a href={downloadUrl} download 
+     class="text-blue-600 hover:text-blue-800 text-sm underline">
+    proof.bin ({fileSize})
+  </a>
+  <button data-verify-button data-proof-id={proofId}
+          class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+    Verify
+  </button>
+</div>
+
+<script>
+  function verifyProof(proofId) {
+    // Get the button element to show loading state
+    const button = event.target;
+    const originalText = button.textContent;
+    
+    // Show loading state
+    button.textContent = 'Verifying...';
+    button.disabled = true;
+    button.classList.add('opacity-50');
+    
+    // Simulate verification process
+    setTimeout(() => {
+      // Simulate success/failure (90% success rate for demo)
+      const isSuccess = Math.random() > 0.1;
+      
+      if (isSuccess) {
+        button.textContent = '✓ Verified';
+        button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        button.classList.add('bg-green-600');
+        
+        // Show success message
+        showNotification('Proof verification successful!', 'success');
+      } else {
+        button.textContent = '✗ Failed';
+        button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        button.classList.add('bg-red-600');
+        
+        // Show error message
+        showNotification('Proof verification failed!', 'error');
+      }
+      
+      // Re-enable button after 3 seconds
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.disabled = false;
+        button.classList.remove('opacity-50', 'bg-green-600', 'bg-red-600');
+        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+      }, 3000);
+    }, 1500);
+  }
+  
+  function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 transition-all duration-300 ${
+      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    notification.textContent = message;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
+  }
+
+  // Find all verify buttons and add event listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    const verifyButtons = document.querySelectorAll('[data-verify-button]');
+    
+    verifyButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        const proofId = button.getAttribute('data-proof-id');
+        verifyProof(proofId);
+      });
+    });
+  });
+</script>

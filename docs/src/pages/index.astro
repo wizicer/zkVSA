@@ -1,104 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import WorkflowSVG from '../assets/workflow.svg';
-
-// Sample data for the samples table
-const samples = [
-  {
-    transcript: "Hello, this is a sample transcript for demonstration purposes.",
-    originalSpeech: "sample1_original.wav",
-    anonymizedSpeech: {
-			"-3":{
-      f32: "sample1_f32.wav",
-      m32: "sample1_m32.wav", 
-      m377: "sample1_m377.wav"
-			},
-			"-2":{
-				f32: "sample1_f32.wav",
-				m32: "sample1_m32.wav", 
-				m377: "sample1_m377.wav"
-			},
-			"-1":{
-				f32: "sample1_f32.wav",
-				m32: "sample1_m32.wav", 
-				m377: "sample1_m377.wav"
-			},
-			"1":{
-				f32: "sample1_f32.wav",
-				m32: "sample1_m32.wav", 
-				m377: "sample1_m377.wav"
-			},
-			"2":{
-				f32: "sample1_f32.wav",
-				m32: "sample1_m32.wav", 
-				m377: "sample1_m377.wav"
-			},
-			"3":{
-				f32: "sample1_f32.wav",
-				m32: "sample1_m32.wav", 
-				m377: "sample1_m377.wav"
-			}
-    },
-    proof: {
-      "-3": { size: "2.5 KB" },
-      "-2": { size: "2.5 KB" },
-      "-1": { size: "2.5 KB" },
-      "1": { size: "2.5 KB" },
-      "2": { size: "2.5 KB" },
-      "3": { size: "2.5 KB" }
-    }
-  },
-  {
-    transcript: "Another example transcript to show the anonymization capabilities.",
-    originalSpeech: "sample2_original.wav",
-    anonymizedSpeech: {
-      "-3":{
-        f32: "sample2_f32.wav",
-        m32: "sample2_m32.wav", 
-        m377: "sample2_m377.wav"
-      },
-      "-2":{
-        f32: "sample2_f32.wav",
-        m32: "sample2_m32.wav", 
-        m377: "sample2_m377.wav"
-      },
-      "-1":{
-        f32: "sample2_f32.wav",
-        m32: "sample2_m32.wav", 
-        m377: "sample2_m377.wav"
-      },
-      "1":{
-        f32: "sample2_f32.wav",
-        m32: "sample2_m32.wav", 
-        m377: "sample2_m377.wav"
-      },
-      "2":{
-        f32: "sample2_f32.wav",
-        m32: "sample2_m32.wav", 
-        m377: "sample2_m377.wav"
-      },
-      "3":{
-        f32: "sample2_f32.wav",
-        m32: "sample2_m32.wav", 
-        m377: "sample2_m377.wav"
-      }
-    },
-    proof: {
-      "-3": { size: "2.6 KB" },
-      "-2": { size: "2.6 KB" },
-      "-1": { size: "2.6 KB" },
-      "1": { size: "2.6 KB" },
-      "2": { size: "2.6 KB" },
-      "3": { size: "2.6 KB" }
-    }
-  }
-];
+import VerifyButton from '../components/VerifyButton.astro';
+import { samples } from '../data/samples.js';
 ---
 
 <Layout>
   <main class="min-h-screen bg-white">
     <!-- Title and Authors Section -->
-    <section class="py-12 border-b border-gray-200">
+    <section class="py-12">
       <div class="max-w-4xl mx-auto px-6 text-center">
         <h1 class="text-4xl font-bold text-gray-900 mb-6">
           ZK-VSA: Zero-Knowledge Voice Synthesis Anonymization
@@ -108,7 +18,7 @@ const samples = [
     </section>
 
     <!-- Abstract Section -->
-    <section class="py-8 border-b border-gray-200">
+    <section class="py-8">
       <div class="max-w-4xl mx-auto px-6">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Abstract</h2>
         <p class="text-gray-700 leading-relaxed">
@@ -122,14 +32,20 @@ const samples = [
     </section>
 
     <!-- System Model Section -->
-    <section class="py-8 border-b border-gray-200">
+    <section class="py-8">
       <div class="max-w-4xl mx-auto px-6">
         <h2 class="text-2xl font-semibold text-gray-800 mb-6">System Model</h2>
-        <div class="bg-gray-50 border border-gray-200 p-8">
           <div class="flex justify-center">
             <WorkflowSVG class="max-w-full h-auto" />
           </div>
-        </div>
+        <p class="text-gray-700 leading-relaxed">
+          The system model illustrates our proposed ZK-VSA architecture, which consists of three main components: 
+          the voice anonymization module, the zero-knowledge proof generation system, and the verification framework. 
+          The anonymization module processes input speech using multiple algorithms (f32, m32, m377) across different 
+          semitone variations, while the proof system generates cryptographic proofs to ensure the integrity and 
+          privacy of the anonymization process. The verification framework allows users to verify the authenticity 
+          of anonymized speech without revealing the original content or the anonymization parameters.
+        </p>
       </div>
     </section>
 
@@ -138,70 +54,65 @@ const samples = [
       <div class="max-w-7xl mx-auto px-6">
         <h2 class="text-2xl font-semibold text-gray-800 mb-6">Samples</h2>
         <div class="overflow-x-auto">
-          <table class="w-full border border-gray-300">
+          <table class="w-full border-collapse">
             <thead>
-              <tr class="bg-gray-100">
-                <th rowspan="2" class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-800">Transcript</th>
-                <th rowspan="2" class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-800">Original Speech</th>
-                <th rowspan="2" class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-800">Semitone</th>
-                <th colspan="3" class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-800">Anonymized Speech</th>
-                <th rowspan="2" class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-800">Proof (m377)</th>
+              <tr class="bg-gray-100 border-b border-gray-300">
+                <th rowspan="2" class="px-4 py-3 text-left font-semibold text-gray-800">Transcript</th>
+                <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Original Speech</th>
+                <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Semitone</th>
+                <th colspan="3" class="px-4 py-3 text-center font-semibold text-gray-800">Anonymized Speech</th>
+                <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Proof (m377)</th>
               </tr>
-              <tr class="bg-gray-100">
-                <th class="border border-gray-300 px-2 py-2 text-center font-medium text-gray-700">f32</th>
-                <th class="border border-gray-300 px-2 py-2 text-center font-medium text-gray-700">m32</th>
-                <th class="border border-gray-300 px-2 py-2 text-center font-medium text-gray-700">m377</th>
+              <tr class="bg-gray-100 border-b border-gray-300">
+                <th class="px-2 py-2 text-center font-medium text-gray-700">f32</th>
+                <th class="px-2 py-2 text-center font-medium text-gray-700">m32</th>
+                <th class="px-2 py-2 text-center font-medium text-gray-700">m377</th>
               </tr>
             </thead>
             <tbody>
               {samples.map((sample, sampleIndex) => (
-                Object.keys(sample.anonymizedSpeech).map((semitone, semitoneIndex) => (
-                  <tr key={`${sampleIndex}-${semitone}`} class="hover:bg-gray-50">
+                ["3", "2", "1", "-1", "-2", "-3"].map((semitone, semitoneIndex) => (
+                  <tr key={`${sampleIndex}-${semitone}`} class="hover:bg-gray-50 border-b border-gray-200">
                     {semitoneIndex === 0 && (
-                      <td rowspan="6" class="border border-gray-300 px-4 py-3 text-sm text-gray-700 max-w-xs">
+                      <td rowspan="6" class="px-4 py-3 text-sm text-gray-700 max-w-xs">
                         {sample.transcript}
                       </td>
                     )}
                     {semitoneIndex === 0 && (
-                      <td rowspan="6" class="border border-gray-300 px-4 py-3 text-center">
+                      <td rowspan="6" class="px-4 py-3 text-center">
                         <audio controls class="w-24 h-6">
                           <source src={`/audio/${sample.originalSpeech}`} type="audio/wav" />
                           Your browser does not support the audio element.
                         </audio>
                       </td>
                     )}
-                    <td class="border border-gray-300 px-4 py-3 text-center font-medium text-gray-800">
+                    <td class="px-4 py-3 text-center font-medium text-gray-800">
                       {semitone}
                     </td>
-                    <td class="border border-gray-300 px-2 py-3 text-center">
+                    <td class="px-2 py-3 text-center">
                       <audio controls class="w-24 h-6">
                         <source src={`/audio/${sample.anonymizedSpeech[semitone].f32}`} type="audio/wav" />
                         Your browser does not support the audio element.
                       </audio>
                     </td>
-                    <td class="border border-gray-300 px-2 py-3 text-center">
+                    <td class="px-2 py-3 text-center">
                       <audio controls class="w-24 h-6">
                         <source src={`/audio/${sample.anonymizedSpeech[semitone].m32}`} type="audio/wav" />
                         Your browser does not support the audio element.
                       </audio>
                     </td>
-                    <td class="border border-gray-300 px-2 py-3 text-center">
+                    <td class="px-2 py-3 text-center">
                       <audio controls class="w-24 h-6">
                         <source src={`/audio/${sample.anonymizedSpeech[semitone].m377}`} type="audio/wav" />
                         Your browser does not support the audio element.
                       </audio>
                     </td>
-                    <td class="border border-gray-300 px-4 py-3 text-center">
-                      <div class="flex flex-col items-center space-y-1">
-                        <a href={`/proofs/sample${sampleIndex + 1}_${semitone}_m377_proof.bin`} download 
-                           class="text-blue-600 hover:text-blue-800 text-sm underline">
-                          proof.bin ({sample.proof[semitone].size})
-                        </a>
-                        <button onclick={`verifyProof('sample${sampleIndex + 1}_${semitone}_m377')`}
-                                class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
-                          Verify
-                        </button>
-                      </div>
+                    <td class="px-4 py-3 text-center">
+                      <VerifyButton 
+                        proofId={`sample${sampleIndex + 1}_${semitone}_m377`}
+                        downloadUrl={`/proofs/sample${sampleIndex + 1}_${semitone}_m377_proof.bin`}
+                        fileSize={sample.proof[semitone].size}
+                      />
                     </td>
                   </tr>
                 ))
@@ -222,10 +133,3 @@ const samples = [
   }
 </style>
 
-<script>
-  function verifyProof(proofId) {
-    // Placeholder for proof verification logic
-    alert(`Verifying proof for ${proofId}...`);
-    // In a real implementation, this would call your verification API
-  }
-</script>
