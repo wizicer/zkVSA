@@ -10,6 +10,8 @@ const samples: Sample[] = samplesData as Sample[];
 
 // Verifier state
 let isVerifierLoaded = false;
+
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout>
@@ -173,7 +175,8 @@ let isVerifierLoaded = false;
     try {
       // Load the WASM module
       const go = new (window as any).Go();
-      const result = await WebAssembly.instantiateStreaming(fetch("/wasm/main.wasm"), go.importObject);
+      const base = import.meta.env.BASE_URL;
+      const result = await WebAssembly.instantiateStreaming(fetch(base + "/wasm/main.wasm"), go.importObject);
       
       // Run the Go program
       go.run(result.instance);
@@ -228,7 +231,7 @@ let isVerifierLoaded = false;
 
 <script is:inline>
   const script = document.createElement("script");
-  script.src = "/wasm/wasm_exec.js";
+  script.src = "{base}/wasm/wasm_exec.js";
   script.async = true;
   document.head.appendChild(script);
 </script>
