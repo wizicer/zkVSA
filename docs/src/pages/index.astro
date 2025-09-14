@@ -10,8 +10,6 @@ const samples: Sample[] = samplesData as Sample[];
 
 // Verifier state
 let isVerifierLoaded = false;
-
-const base = import.meta.env.BASE_URL;
 ---
 
 <Layout>
@@ -231,7 +229,7 @@ const base = import.meta.env.BASE_URL;
 
 <script is:inline>
   const script = document.createElement("script");
-  script.src = "{base}/wasm/wasm_exec.js";
+  script.src = "/zkVSA/wasm/wasm_exec.js";
   script.async = true;
   document.head.appendChild(script);
 </script>
