@@ -31,8 +31,9 @@ const { proofId, downloadUrl, fileSize, disabled = false } = Astro.props;
 
 <script>
   import { showNotification } from '../utils/notifications.ts';
+  import '../types/wasm.d.ts';
 
-  function verifyProof(proofId: string) {
+  async function verifyProof(proofId: string) {
     // Get the button element to show loading state
     const button = event?.target as HTMLButtonElement;
     if (!button || button.disabled) return;
@@ -44,35 +45,49 @@ const { proofId, downloadUrl, fileSize, disabled = false } = Astro.props;
     button.disabled = true;
     button.classList.add('opacity-50');
     
-    // Simulate verification process
-    setTimeout(() => {
-      // Simulate success/failure (90% success rate for demo)
-      const isSuccess = Math.random() > 0.1;
+    try {
+      if (typeof window.verifyProof === 'undefined') {
+        throw new Error('WASM verifier not loaded. Please load the verifier first.');
+      }
       
-      if (isSuccess) {
+      const proofUrl = `/proofs/${proofId}_proof.bin`;
+      const response = await fetch(proofUrl);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch proof file: ${response.statusText}`);
+      }
+      
+      const result = window.verifyProof(await response.text());
+      
+      if (result.success) {
         button.textContent = '✓ Verified';
         button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
         button.classList.add('bg-green-600');
         
-        // Show success message
         showNotification('Proof verification successful!', 'success');
       } else {
         button.textContent = '✗ Failed';
         button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
         button.classList.add('bg-red-600');
         
-        // Show error message
-        showNotification('Proof verification failed!', 'error');
+        showNotification(`Proof verification failed: ${result.error}`, 'error');
       }
       
-      // Re-enable button after 3 seconds
-      setTimeout(() => {
-        button.textContent = originalText;
-        button.disabled = false;
-        button.classList.remove('opacity-50', 'bg-green-600', 'bg-red-600');
-        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
-      }, 3000);
-    }, 1500);
+    } catch (error) {
+      button.textContent = '✗ Failed';
+      button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+      button.classList.add('bg-red-600');
+      
+      showNotification(`Verification error: ${error instanceof Error ? error.message : String(error)}`, 'error');
+    }
+    
+    // Re-enable button after 3 seconds
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.disabled = false;
+      button.classList.remove('opacity-50', 'bg-green-600', 'bg-red-600');
+      button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+    }, 3000);
   }
 
   // Find all verify buttons and add event listeners

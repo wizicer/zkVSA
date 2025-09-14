@@ -152,8 +152,12 @@ let isVerifierLoaded = false;
 <script>
   import { showNotification } from '../utils/notifications.ts';
 
+  // Import type declarations
+  import '../types/wasm.d.ts';
+
   // Global verifier state
   let isVerifierLoaded = false;
+  let wasmModule = null;
 
   // Load verifier function
   async function loadVerifier() {
@@ -167,30 +171,42 @@ let isVerifierLoaded = false;
     loadBtn.classList.add('bg-orange-500');
 
     try {
-      // Simulate loading the 13MB verifier
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Load the WASM module
+      const go = new (window as any).Go();
+      const result = await WebAssembly.instantiateStreaming(fetch("/wasm/main.wasm"), go.importObject);
       
-      // Mark verifier as loaded
-      isVerifierLoaded = true;
+      // Run the Go program
+      go.run(result.instance);
       
-      // Update button state
-      loadBtn.textContent = '✓ Verifier Loaded';
-      loadBtn.classList.remove('bg-orange-500');
-      loadBtn.classList.add('bg-green-600');
-      
-      // Enable all verify buttons
-      const verifyButtons = document.querySelectorAll('[data-verify-button]') as NodeListOf<HTMLButtonElement>;
-      verifyButtons.forEach(button => {
-        button.disabled = false;
-        button.classList.remove('bg-gray-400', 'cursor-not-allowed');
-        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
-        button.title = '';
-      });
+      // Check if functions are available
+      if (typeof window.verifyProof === 'function') {
+        // Mark verifier as loaded
+        isVerifierLoaded = true;
+        wasmModule = result.instance;
+        
+        // Update button state
+        loadBtn.textContent = '✓ Verifier Loaded';
+        loadBtn.classList.remove('bg-orange-500');
+        loadBtn.classList.add('bg-green-600');
+        
+        // Enable all verify buttons
+        const verifyButtons = document.querySelectorAll('[data-verify-button]') as NodeListOf<HTMLButtonElement>;
+        verifyButtons.forEach(button => {
+          button.disabled = false;
+          button.classList.remove('bg-gray-400', 'cursor-not-allowed');
+          button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+          button.title = '';
+        });
 
-      // Show success notification
-      showNotification('Verifier loaded successfully! You can now verify proofs.', 'success');
+        // Show success notification
+        showNotification('Verifier loaded successfully! You can now verify proofs.', 'success');
+      } else {
+        throw new Error('Required functions not found in WASM module');
+      }
       
     } catch (error) {
+      console.error('Failed to load WASM module:', error);
+      
       // Handle error
       loadBtn.textContent = 'Load Verifier';
       loadBtn.disabled = false;
@@ -210,3 +226,9 @@ let isVerifierLoaded = false;
   });
 </script>
 
+<script is:inline>
+  const script = document.createElement("script");
+  script.src = "/wasm/wasm_exec.js";
+  script.async = true;
+  document.head.appendChild(script);
+</script>

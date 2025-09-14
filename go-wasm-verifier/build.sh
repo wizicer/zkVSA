@@ -23,4 +23,11 @@ if [ ! -f "wasm_exec.js" ]; then
     fi
 fi
 
-echo "Build complete! Output: main.wasm"
+# Copy files to docs public folder
+echo "Copying files to docs public folder..."
+mkdir -p ../docs/public/wasm
+cp main.wasm ../docs/public/wasm/
+cp wasm_exec.js ../docs/public/wasm/
+echo "Files copied to docs/public/wasm/"
+
+echo "Build complete! Output: main.wasm and wasm_exec.js in docs/public/wasm/"
