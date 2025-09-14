@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go WASM Gnark Verifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #555;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .loading {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .status {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .wasm-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .wasm-loaded {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .wasm-loading {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .wasm-not-loaded {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        .wasm-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Go WASM Gnark Verifier</h1>
+        
+        <div class="section">
+            <h2>WASM Module Status</h2>
+            <div class="status">
+                Status: <span id="wasmStatus" class="wasm-status wasm-loading">Not Loaded</span>
+            </div>
+            <div id="wasmInfo" class="result info" style="display: none;"></div>
+            <button id="loadWasmBtn" onclick="loadWasmModule()">Load WASM Module</button>
+        </div>
+
+        <div class="section">
+            <h2>Test Functions</h2>
+            <button id="testBtn" onclick="testBasicFunction()" disabled>Test Basic Function</button>
+            <div id="testResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="section">
+            <h2>Proof Verification</h2>
+            <p>Load proof data from the gnark-circuit project and verify it using the Go WASM module.</p>
+            
+            <button id="loadProofBtn" onclick="loadProofData()" disabled>Load Proof Data</button>
+            <button id="verifyBtn" onclick="verifyProofJS()" disabled>Verify Proof</button>
+            
+            <div id="proofData" style="margin-top: 15px;">
+                <label for="proofTextarea">Proof Data (JSON):</label>
+                <textarea id="proofTextarea" placeholder="Proof data will be loaded here..."></textarea>
+            </div>
+            
+            <div id="verifyResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="section">
+            <h2>Instructions</h2>
+            <ol>
+                <li>Click "Load WASM Module" to load the Go WASM verifier (13MB download)</li>
+                <li>Run the gnark-circuit project to generate proof data: <code>cd gnark-circuit && go run .</code></li>
+                <li>Click "Load Proof Data" to load the generated proof, or copy the <code>proof_data.json</code> content into the textarea</li>
+                <li>Click "Verify Proof" to verify the proof using the Go WASM module</li>
+            </ol>
+            <p><strong>Note:</strong> The WASM module is loaded on-demand to improve initial page load time.</p>
+        </div>
+    </div>
+
+    <script src="wasm_exec.js"></script>
+    <script>
+        let wasmModule = null;
+        let proofData = null;
+        let wasmLoaded = false;
+
+        // Load WASM module on-demand
+        async function loadWasmModule() {
+            if (wasmLoaded) {
+                console.log('WASM module already loaded');
+                return;
+            }
+
+            try {
+                const statusEl = document.getElementById('wasmStatus');
+                const infoEl = document.getElementById('wasmInfo');
+                const loadBtn = document.getElementById('loadWasmBtn');
+                
+                statusEl.textContent = 'Loading...';
+                statusEl.className = 'wasm-status wasm-loading';
+                loadBtn.disabled = true;
+                loadBtn.textContent = 'Loading...';
+                
+                // Load the WASM module
+                const go = new Go();
+                const result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject);
+                
+                // Run the Go program
+                go.run(result.instance);
+                
+                // Check if functions are available
+                if (typeof window.testFunction === 'function' && typeof window.verifyProof === 'function') {
+                    statusEl.textContent = 'Loaded Successfully';
+                    statusEl.className = 'wasm-status wasm-loaded';
+                    
+                    infoEl.textContent = 'WASM module loaded successfully. Functions available:\n- testFunction()\n- verifyProof(proofDataJSON)';
+                    infoEl.style.display = 'block';
+                    
+                    // Enable buttons
+                    document.getElementById('testBtn').disabled = false;
+                    document.getElementById('loadProofBtn').disabled = false;
+                    document.getElementById('verifyBtn').disabled = false;
+                    
+                    wasmModule = result.instance;
+                    wasmLoaded = true;
+                    
+                    loadBtn.textContent = 'WASM Loaded';
+                    loadBtn.disabled = true;
+                } else {
+                    throw new Error('Required functions not found in WASM module');
+                }
+                
+            } catch (error) {
+                console.error('Failed to load WASM module:', error);
+                const statusEl = document.getElementById('wasmStatus');
+                const infoEl = document.getElementById('wasmInfo');
+                const loadBtn = document.getElementById('loadWasmBtn');
+                
+                statusEl.textContent = 'Load Failed';
+                statusEl.className = 'wasm-status wasm-error';
+                
+                infoEl.textContent = 'Failed to load WASM module: ' + error.message;
+                infoEl.className = 'result error';
+                infoEl.style.display = 'block';
+                
+                loadBtn.disabled = false;
+                loadBtn.textContent = 'Retry Load WASM';
+            }
+        }
+
+        // Initialize WASM module (deprecated - now using on-demand loading)
+        async function initWasm() {
+            try {
+                const statusEl = document.getElementById('wasmStatus');
+                const infoEl = document.getElementById('wasmInfo');
+                
+                statusEl.textContent = 'Loading...';
+                statusEl.className = 'wasm-status wasm-loading';
+                
+                // Load the WASM module
+                const go = new Go();
+                const result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject);
+                
+                // Run the Go program
+                go.run(result.instance);
+                
+                // Check if functions are available
+                if (typeof window.testFunction === 'function' && typeof window.verifyProof === 'function') {
+                    statusEl.textContent = 'Loaded Successfully';
+                    statusEl.className = 'wasm-status wasm-loaded';
+                    
+                    infoEl.textContent = 'WASM module loaded successfully. Functions available:\n- testFunction()\n- verifyProof(proofDataJSON)';
+                    infoEl.style.display = 'block';
+                    
+                    // Enable buttons
+                    document.getElementById('testBtn').disabled = false;
+                    document.getElementById('loadProofBtn').disabled = false;
+                    document.getElementById('verifyBtn').disabled = false;
+                    
+                    wasmModule = result.instance;
+                } else {
+                    throw new Error('Required functions not found in WASM module');
+                }
+                
+            } catch (error) {
+                console.error('Failed to load WASM module:', error);
+                const statusEl = document.getElementById('wasmStatus');
+                const infoEl = document.getElementById('wasmInfo');
+                
+                statusEl.textContent = 'Load Failed';
+                statusEl.className = 'wasm-status wasm-error';
+                
+                infoEl.textContent = 'Failed to load WASM module: ' + error.message;
+                infoEl.className = 'result error';
+                infoEl.style.display = 'block';
+            }
+        }
+
+        // Test basic function
+        function testBasicFunction() {
+            if (!wasmLoaded) {
+                const resultEl = document.getElementById('testResult');
+                resultEl.textContent = 'Error: WASM module not loaded. Please click "Load WASM Module" first.';
+                resultEl.className = 'result error';
+                resultEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const result = window.testFunction();
+                const resultEl = document.getElementById('testResult');
+                
+                resultEl.textContent = JSON.stringify(result, null, 2);
+                resultEl.className = result.success ? 'result success' : 'result error';
+                resultEl.style.display = 'block';
+                
+            } catch (error) {
+                const resultEl = document.getElementById('testResult');
+                resultEl.textContent = 'Error: ' + error.message;
+                resultEl.className = 'result error';
+                resultEl.style.display = 'block';
+            }
+        }
+
+        // Load proof data from file
+        async function loadProofData() {
+            try {
+                const response = await fetch('../gnark-circuit/proof_data.json');
+                if (!response.ok) {
+                    throw new Error('Failed to load proof data: ' + response.statusText);
+                }
+                
+                const data = await response.text();
+                document.getElementById('proofTextarea').value = data;
+                proofData = data;
+                
+                const resultEl = document.getElementById('verifyResult');
+                resultEl.textContent = 'Proof data loaded successfully!';
+                resultEl.className = 'result success';
+                resultEl.style.display = 'block';
+                
+            } catch (error) {
+                const resultEl = document.getElementById('verifyResult');
+                resultEl.textContent = 'Failed to load proof data: ' + error.message;
+                resultEl.className = 'result error';
+                resultEl.style.display = 'block';
+            }
+        }
+
+        // Verify proof
+        function verifyProofJS() {
+            if (!wasmLoaded) {
+                const resultEl = document.getElementById('verifyResult');
+                resultEl.textContent = 'Error: WASM module not loaded. Please click "Load WASM Module" first.';
+                resultEl.className = 'result error';
+                resultEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const proofDataText = document.getElementById('proofTextarea').value;
+                if (!proofDataText.trim()) {
+                    throw new Error('Please load or enter proof data first');
+                }
+                
+                const resultEl = document.getElementById('verifyResult');
+                resultEl.textContent = 'Verifying proof...';
+                resultEl.className = 'result loading';
+                resultEl.style.display = 'block';
+                
+                // Call the WASM function
+                const result = window.verifyProof(proofDataText);
+                
+                resultEl.textContent = JSON.stringify(result, null, 2);
+                resultEl.className = result.success ? 'result success' : 'result error';
+                
+            } catch (error) {
+                const resultEl = document.getElementById('verifyResult');
+                resultEl.textContent = 'Error: ' + error.message;
+                resultEl.className = 'result error';
+                resultEl.style.display = 'block';
+            }
+        }
+
+        // Initialize page state when page loads
+        window.addEventListener('load', function() {
+            // Set initial status
+            const statusEl = document.getElementById('wasmStatus');
+            statusEl.textContent = 'Not Loaded';
+            statusEl.className = 'wasm-status wasm-not-loaded';
+        });
+    </script>
+</body>
+</html>
