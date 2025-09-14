@@ -10,6 +10,8 @@ const samples: Sample[] = samplesData as Sample[];
 
 // Verifier state
 let isVerifierLoaded = false;
+
+const selectiveAlgorithms = ["f32", "m377"] as const;
 ---
 
 <Layout>
@@ -67,7 +69,7 @@ let isVerifierLoaded = false;
                 <th rowspan="2" class="px-4 py-3 text-left font-semibold text-gray-800">Transcript</th>
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Original Speech</th>
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Semitone</th>
-                <th colspan="3" class="px-4 py-3 text-center font-semibold text-gray-800">Anonymized Speech</th>
+                <th colspan={selectiveAlgorithms.length} class="px-4 py-3 text-center font-semibold text-gray-800">Anonymized Speech</th>
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">
                   <div class="flex flex-col items-center space-y-2">
                     <span>Proof (m377)</span>
@@ -79,9 +81,9 @@ let isVerifierLoaded = false;
                 </th>
               </tr>
               <tr class="bg-gray-100 border-b border-gray-300">
-                <th class="px-2 py-2 text-center font-medium text-gray-700">f32</th>
-                <th class="px-2 py-2 text-center font-medium text-gray-700">m32</th>
-                <th class="px-2 py-2 text-center font-medium text-gray-700">m377</th>
+                {selectiveAlgorithms.map((algorithm) => (
+                  <th class="px-2 py-2 text-center font-medium text-gray-700">{algorithm}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -104,24 +106,14 @@ let isVerifierLoaded = false;
                     <td class="px-4 py-3 text-center font-medium text-gray-800">
                       {semitone}
                     </td>
-                    <td class="px-2 py-3 text-center">
-                      <audio controls class="w-24 h-6">
-                        <source src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech].f32}`} type="audio/wav" />
-                        Your browser does not support the audio element.
-                      </audio>
-                    </td>
-                    <td class="px-2 py-3 text-center">
-                      <audio controls class="w-24 h-6">
-                        <source src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech].m32}`} type="audio/wav" />
-                        Your browser does not support the audio element.
-                      </audio>
-                    </td>
-                    <td class="px-2 py-3 text-center">
-                      <audio controls class="w-24 h-6">
-                        <source src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech].m377}`} type="audio/wav" />
-                        Your browser does not support the audio element.
-                      </audio>
-                    </td>
+                    {selectiveAlgorithms.map((algorithm) => (
+                      <td class="px-2 py-3 text-center">
+                        <audio controls class="w-24 h-6">
+                          <source src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech][algorithm as keyof typeof sample.anonymizedSpeech[typeof semitone]]}`} type="audio/wav" />
+                          Your browser does not support the audio element.
+                        </audio>
+                      </td>
+                    ))}
                     <td class="px-4 py-3 text-center">
                       <VerifyButton 
                         proofId={`sample${sampleIndex + 1}_${semitone}_m377`}
