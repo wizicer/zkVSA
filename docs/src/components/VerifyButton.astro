@@ -10,97 +10,103 @@ const { proofId, downloadUrl, fileSize, disabled = false } = Astro.props;
 ---
 
 <div class="flex items-center space-x-2">
-  <button data-verify-button data-proof-id={proofId}
-          disabled={disabled}
-          class={`px-3 py-1 text-white text-xs rounded transition-colors ${
-            disabled 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-          title={disabled ? 'Must load verifier first to verify' : ''}>
+  <button
+    data-verify-button
+    data-proof-id={proofId}
+    disabled={disabled}
+    class={`px-3 py-1 text-white text-xs rounded transition-colors ${
+      disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+    }`}
+    title={disabled ? "Must load verifier first to verify" : ""}
+  >
     Verify
   </button>
   <div class="relative group">
-    <a href={downloadUrl} download 
-       class="text-blue-600 hover:text-blue-800 transition-colors">
+    <a href={downloadUrl} download class="text-blue-600 hover:text-blue-800 transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        ></path>
       </svg>
     </a>
-    <span class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-10">
-      Download proof.json<br>(Proof size: {fileSize})
+    <span
+      class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-10"
+    >
+      Download proof.json<br />(Proof size: {fileSize})
     </span>
   </div>
 </div>
 
 <script>
-  import { showNotification } from '../utils/notifications.ts';
-  import '../types/wasm.d.ts';
+  import { showNotification } from "../utils/notifications.ts";
+  import "../types/wasm.d.ts";
 
   async function verifyProof(proofId: string) {
     // Get the button element to show loading state
     const button = event?.target as HTMLButtonElement;
     if (!button || button.disabled) return;
-    
-    const originalText = button.textContent || '';
-    
+
+    const originalText = button.textContent || "";
+
     // Show loading state
-    button.textContent = 'Verifying...';
+    button.textContent = "Verifying...";
     button.disabled = true;
-    button.classList.add('opacity-50');
-    
+    button.classList.add("opacity-50");
+
     try {
-      if (typeof window.verifyProof === 'undefined') {
-        throw new Error('WASM verifier not loaded. Please load the verifier first.');
+      if (typeof window.verifyProof === "undefined") {
+        throw new Error("WASM verifier not loaded. Please load the verifier first.");
       }
-      
+
       const proofUrl = `/proofs/${proofId}_proof.bin`;
       const response = await fetch(proofUrl);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch proof file: ${response.statusText}`);
       }
-      
+
       const result = window.verifyProof(await response.text());
-      
+
       if (result.success) {
-        button.textContent = '✓ Verified';
-        button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        button.classList.add('bg-green-600');
-        
-        showNotification('Proof verification successful!', 'success');
+        button.textContent = "✓ Verified";
+        button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+        button.classList.add("bg-green-600");
+
+        showNotification("Proof verification successful!", "success");
       } else {
-        button.textContent = '✗ Failed';
-        button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        button.classList.add('bg-red-600');
-        
-        showNotification(`Proof verification failed: ${result.error}`, 'error');
+        button.textContent = "✗ Failed";
+        button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+        button.classList.add("bg-red-600");
+
+        showNotification(`Proof verification failed: ${result.error}`, "error");
       }
-      
     } catch (error) {
-      button.textContent = '✗ Failed';
-      button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-      button.classList.add('bg-red-600');
-      
-      showNotification(`Verification error: ${error instanceof Error ? error.message : String(error)}`, 'error');
+      button.textContent = "✗ Failed";
+      button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+      button.classList.add("bg-red-600");
+
+      showNotification(`Verification error: ${error instanceof Error ? error.message : String(error)}`, "error");
     }
-    
+
     // Re-enable button after 3 seconds
     setTimeout(() => {
       button.textContent = originalText;
       button.disabled = false;
-      button.classList.remove('opacity-50', 'bg-green-600', 'bg-red-600');
-      button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+      button.classList.remove("opacity-50", "bg-green-600", "bg-red-600");
+      button.classList.add("bg-blue-600", "hover:bg-blue-700");
     }, 3000);
   }
 
   // Find all verify buttons and add event listeners
-  document.addEventListener('DOMContentLoaded', () => {
-    const verifyButtons = document.querySelectorAll('[data-verify-button]');
-    
+  document.addEventListener("DOMContentLoaded", () => {
+    const verifyButtons = document.querySelectorAll("[data-verify-button]");
+
     verifyButtons.forEach((button) => {
-      button.addEventListener('click', (event) => {
-        const proofId = button.getAttribute('data-proof-id');
+      button.addEventListener("click", (event) => {
+        const proofId = button.getAttribute("data-proof-id");
         if (proofId) {
           verifyProof(proofId);
         }
