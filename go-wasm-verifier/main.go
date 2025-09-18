@@ -10,7 +10,6 @@ import (
 	"github.com/consensys/gnark-crypto/ecc"
 	"github.com/consensys/gnark/backend/groth16"
 	"github.com/consensys/gnark/frontend"
-	"github.com/consensys/gnark/frontend/cs/r1cs"
 )
 
 var isInitialized = false
@@ -20,19 +19,6 @@ type ProofData struct {
 	Proof        []byte `json:"proof"`
 	VK           []byte `json:"vk"`
 	PublicValues []byte `json:"public_values"`
-}
-
-// SimpleCircuit defines the same circuit as in the original project
-type SimpleCircuit struct {
-	Secret      frontend.Variable `gnark:",secret"`
-	PublicValue frontend.Variable `gnark:",public"`
-}
-
-// Define declares the circuit's constraints
-func (circuit *SimpleCircuit) Define(api frontend.API) error {
-	doubled := api.Mul(circuit.Secret, 2)
-	api.AssertIsEqual(doubled, circuit.PublicValue)
-	return nil
 }
 
 // verifyProof verifies a Groth16 proof
@@ -59,19 +45,9 @@ func verifyProof(this js.Value, args []js.Value) interface{} {
 		return result
 	}
 
-	// Compile the circuit to get the constraint system
-	var circuit SimpleCircuit
-	_, err := frontend.Compile(ecc.BLS12_377.ScalarField(), r1cs.NewBuilder, &circuit)
-	if err != nil {
-		result := js.Global().Get("Object").New()
-		result.Set("success", false)
-		result.Set("error", "Failed to compile circuit: "+err.Error())
-		return result
-	}
-
 	// Deserialize the verification key
 	vk := groth16.NewVerifyingKey(ecc.BLS12_377)
-	_, err = vk.ReadFrom(bytes.NewReader(proofData.VK))
+	_, err := vk.ReadFrom(bytes.NewReader(proofData.VK))
 	if err != nil {
 		result := js.Global().Get("Object").New()
 		result.Set("success", false)
