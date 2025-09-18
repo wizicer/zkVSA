@@ -16,10 +16,10 @@ const samples: Sample[] = samplesData as Sample[];
 let isVerifierLoaded = false;
 
 const selectiveAlgorithms = ["f32", "m377"] as const;
+const semitones = ["3", "2", "1", "-1", "-2", "-3"] as const;
 const algorithmNames = {
-  original: {name: "Original", description: "Original utterance"},
-  f32: {name: "FPP", description: "Floating-point PV-TSM"},
-  m377: {name: "ZK-VSA", description: "Proposed SNARK-friendly PV-TSM"},
+  f32: { name: "FPP", description: "Floating-point PV-TSM" },
+  m377: { name: "ZK-VSA", description: "Proposed SNARK-friendly PV-TSM" },
 };
 ---
 
@@ -74,7 +74,9 @@ const algorithmNames = {
             <IntroSVG class="max-w-2xl w-full h-auto" />
           </div>
           <figcaption class="mt-4 text-center text-sm text-gray-600 max-w-2xl">
-            Fig.1: Scenario of <em>verifiable speaker anonymization</em> (VSA). A trusted device records and signs speech signal; the system outputs an anonymized signal and proof for verification, resisting: (a) <em>inversion attacks</em>—recovering the original signal, and (b) <em>re-identification attacks</em>—inferring the speaker's identity.
+            Fig.1: Scenario of <em>verifiable speaker anonymization</em> (VSA). A trusted device records and signs speech signal; the
+            system outputs an anonymized signal and proof for verification, resisting: (a) <em>inversion attacks</em>—recovering
+            the original signal, and (b) <em>re-identification attacks</em>—inferring the speaker's identity.
           </figcaption>
         </figure>
       </div>
@@ -89,7 +91,8 @@ const algorithmNames = {
             <WorkflowSVG class="max-w-lg w-full h-auto" />
           </div>
           <figcaption class="mt-4 text-center text-sm text-gray-600 max-w-2xl">
-            <strong>Fig.2:</strong> End-to-end workflow from trusted capture to verifiable anonymized release: device-signed STFT commitments, PV-TSM on phase, a proof bound to those commitments, and public verification with ISTFT reconstruction.
+            <strong>Fig.2:</strong> End-to-end workflow from trusted capture to verifiable anonymized release: device-signed STFT commitments,
+            PV-TSM on phase, a proof bound to those commitments, and public verification with ISTFT reconstruction.
           </figcaption>
         </figure>
         <p class="text-gray-700 leading-relaxed text-justify mt-4">
@@ -176,7 +179,7 @@ const algorithmNames = {
             <tbody>
               {
                 samples.map((sample: Sample, sampleIndex: number) =>
-                  (["3", "2", "1", "-1", "-2", "-3"] as const).map((semitone, semitoneIndex: number) => (
+                  semitones.map((semitone, semitoneIndex: number) => (
                     <tr class="hover:bg-gray-50 border-b border-gray-200">
                       {semitoneIndex === 0 && (
                         <td rowspan="6" class="px-4 py-3 text-sm text-gray-700 max-w-xs">
@@ -186,7 +189,7 @@ const algorithmNames = {
                       {semitoneIndex === 0 && (
                         <td rowspan="6" class="px-4 py-3 text-center">
                           <audio controls class="w-24 h-6">
-                            <source src={`/audio/${sample.originalSpeech}`} type="audio/wav" />
+                            <source src={`/audio/${sample.name}.wav`} type="audio/wav" />
                             Your browser does not support the audio element.
                           </audio>
                         </td>
@@ -195,19 +198,16 @@ const algorithmNames = {
                       {selectiveAlgorithms.map((algorithm) => (
                         <td class="px-2 py-3 text-center">
                           <audio controls class="w-24 h-6">
-                            <source
-                              src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech][algorithm as keyof (typeof sample.anonymizedSpeech)[typeof semitone]]}`}
-                              type="audio/wav"
-                            />
+                            <source src={`/audio/${sample.name}_${algorithm}_${semitone}.flac`} type="audio/flac" />
                             Your browser does not support the audio element.
                           </audio>
                         </td>
                       ))}
                       <td class="px-4 py-3 text-center">
                         <VerifyButton
-                          proofId={`sample${sampleIndex + 1}_${semitone}_m377`}
-                          downloadUrl={`/proofs/sample${sampleIndex + 1}_${semitone}_m377_proof.bin`}
-                          fileSize={sample.proof[semitone as keyof typeof sample.proof].size}
+                          proofId={`${sample.name}_${semitone}_m377`}
+                          downloadUrl={`/proofs/${sample.name}_${semitone}_m377.json`}
+                          fileSize="292 bytes"
                           disabled={!isVerifierLoaded}
                         />
                       </td>
