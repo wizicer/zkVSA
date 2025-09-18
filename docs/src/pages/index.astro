@@ -15,12 +15,14 @@ const samples: Sample[] = samplesData as Sample[];
 // Verifier state
 let isVerifierLoaded = false;
 
-const selectiveAlgorithms = ["f32", "m377"] as const;
+const selectiveAlgorithms = ["f32", "f377"] as const;
 const semitones = ["3", "2", "1", "-1", "-2", "-3"] as const;
 const algorithmNames = {
   f32: { name: "FPP", description: "Floating-point PV-TSM" },
-  m377: { name: "ZK-VSA", description: "Proposed SNARK-friendly PV-TSM" },
+  f377: { name: "ZK-VSA", description: "Proposed SNARK-friendly PV-TSM" },
 };
+
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout>
@@ -205,8 +207,7 @@ const algorithmNames = {
                       ))}
                       <td class="px-4 py-3 text-center">
                         <VerifyButton
-                          proofId={`${sample.name}_${semitone}_m377`}
-                          downloadUrl={`/proofs/${sample.name}_${semitone}_m377.json`}
+                          downloadUrl={`${base}/data/${sample.name}_f377_${semitone}_proof.json`}
                           fileSize="292 bytes"
                           disabled={!isVerifierLoaded}
                         />
