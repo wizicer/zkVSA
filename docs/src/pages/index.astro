@@ -72,13 +72,14 @@ const base = import.meta.env.BASE_URL;
           a path to proof-based guarantees for broader speech transformations.
         </p>
         <figure class="flex flex-col items-center my-8">
-          <div class="w-full flex justify-center">
+          <div class="max-w-lg w-full flex justify-center">
             <IntroSVG class="max-w-2xl w-full h-auto" />
           </div>
-          <figcaption class="mt-4 text-center text-sm text-gray-600 max-w-2xl">
-            Fig.1: Scenario of <em>verifiable speaker anonymization</em> (VSA). A trusted device records and signs speech signal; the
-            system outputs an anonymized signal and proof for verification, resisting: (a) <em>inversion attacks</em>—recovering
-            the original signal, and (b) <em>re-identification attacks</em>—inferring the speaker's identity.
+          <figcaption class="mt-4 text-sm text-justify text-gray-600 max-w-2xl">
+            <strong>Fig.1:</strong> Scenario of <em>verifiable speaker anonymization</em> (VSA). A trusted device records and signs
+            speech signal; the system outputs an anonymized signal and proof for verification, resisting: (a) <em
+              >inversion attacks</em
+            >—recovering the original signal, and (b) <em>re-identification attacks</em>—inferring the speaker's identity.
           </figcaption>
         </figure>
       </div>
@@ -92,11 +93,13 @@ const base = import.meta.env.BASE_URL;
           <div class="flex justify-center w-full">
             <WorkflowSVG class="max-w-lg w-full h-auto" />
           </div>
-          <figcaption class="mt-4 text-center text-sm text-gray-600 max-w-2xl">
+          <figcaption class="mt-4 text-sm text-justify text-gray-600 max-w-2xl">
             <strong>Fig.2:</strong> End-to-end workflow from trusted capture to verifiable anonymized release: device-signed STFT commitments,
             PV-TSM on phase, a proof bound to those commitments, and public verification with ISTFT reconstruction.
           </figcaption>
         </figure>
+        {
+          /*
         <p class="text-gray-700 leading-relaxed text-justify mt-4">
           As illustrated in the Fig.2, before recording, a <em>trusted device</em>
           <Step number={1} /> generates a keypair <LatexRenderer expression="(\\mathsf{sk},\\mathsf{pk})" />. It then records the
@@ -131,6 +134,8 @@ const base = import.meta.env.BASE_URL;
           />. Finally, it <Step number={8} /> runs ISTFT on <LatexRenderer expression="(R,\\Phi_Y)" /> to reconstruct the released
           signal <LatexRenderer expression="y" /> without accessing <LatexRenderer expression="x" />.
         </p>
+         */
+        }
       </div>
     </section>
 
