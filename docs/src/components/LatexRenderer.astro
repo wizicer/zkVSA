@@ -1,0 +1,66 @@
+---
+export interface Props {
+  expression: string;
+  display?: boolean;
+}
+
+const { expression, display = false } = Astro.props;
+---
+
+<span class={`latex-renderer ${display ? 'display-mode' : 'inline-mode'}`}>
+  <span class="latex-expression" data-expression={expression}></span>
+</span>
+
+<style>
+  .latex-renderer {
+    display: inline;
+    font-size: 0.9em;
+  }
+  
+  .latex-renderer.display-mode {
+    display: block;
+    text-align: center;
+    margin: 1em 0;
+    font-size: 1em;
+  }
+  
+  .latex-renderer.inline-mode {
+    display: inline;
+    font-size: 0.9em;
+  }
+  
+  .latex-renderer .katex {
+    font-size: 0.9em;
+  }
+  
+  .latex-renderer .katex-display {
+    font-size: 1em;
+  }
+</style>
+
+<script>
+  import katex from 'katex';
+  import 'katex/dist/katex.min.css';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const latexElements = document.querySelectorAll('.latex-expression');
+    
+    latexElements.forEach((element) => {
+      const expression = element.getAttribute('data-expression');
+      if (expression) {
+        try {
+          const isDisplayMode = element.closest('.latex-renderer')?.classList.contains('display-mode');
+          const rendered = katex.renderToString(expression, {
+            displayMode: isDisplayMode,
+            throwOnError: false,
+            strict: false
+          });
+          element.innerHTML = rendered;
+        } catch (error) {
+          console.error('LaTeX rendering error:', error);
+          element.textContent = expression;
+        }
+      }
+    });
+  });
+</script>

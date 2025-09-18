@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import WorkflowSVG from "../assets/workflow.svg";
 import IntroSVG from "../assets/intro.svg";
 import VerifyButton from "../components/VerifyButton.astro";
+import Step from "../components/Step.astro";
+import LatexRenderer from "../components/LatexRenderer.astro";
 import samplesData from "../data/samples.json";
 import type { Sample } from "../data/types.ts";
 
@@ -74,7 +76,40 @@ const selectiveAlgorithms = ["f32", "m377"] as const;
         <div class="flex justify-center">
           <WorkflowSVG class="max-w-full h-auto" />
         </div>
-        <p class="text-gray-700 leading-relaxed"></p>
+        <p class="text-gray-700 leading-relaxed text-justify">
+          As illustrated in the Figure, before recording, a <em>trusted device</em>
+          <Step number={1} /> generates a keypair <LatexRenderer expression="(\\mathsf{sk},\\mathsf{pk})" />. It then records the
+          input signal <LatexRenderer expression="x" />, <Step number={2} /> computes the STFT to obtain magnitude <LatexRenderer
+            expression="R"
+          /> and phase <LatexRenderer expression="\\Phi_X" />, and derives digests <LatexRenderer expression="h_R=H(R)" /> and <LatexRenderer
+            expression="h_{\\Phi_X}=H(\\Phi_X)"
+          />. The device <Step number={3} /> signs these digests to produce <LatexRenderer
+            expression="\\sigma_R=\\mathrm{Sign}_{\\mathsf{sk}}(h_R)"
+          /> and <LatexRenderer expression="\\sigma_{\\Phi_X}=\\mathrm{Sign}_{\\mathsf{sk}}(h_{\\Phi_X})" />, which serve as
+          commitments binding later computations to the original capture without revealing <LatexRenderer expression="x" />.
+        </p>
+        <p class="text-gray-700 leading-relaxed text-justify">
+          <span class="mx-4"></span>A <em>prover</em> (not necessarily the recording device) <Step number={4} /> applies the anonymization
+          operator to obtain <LatexRenderer expression="\\Phi_Y=\\mathrm{PV\\text{-}TSM}(\\Phi_X)" /> while leaving <LatexRenderer
+            expression="R"
+          /> unchanged, and <Step number={5} /> generates a succinct proof <LatexRenderer expression="\\pi" /> attesting both the PV-TSM
+          relation and the validity of the signature on <LatexRenderer expression="h_{\\Phi_X}" />, while also binding <LatexRenderer
+            expression="\\Phi_Y"
+          /> to <LatexRenderer expression="h_{\\Phi_Y}=H(\\Phi_Y)" />. The prover <Step number={6} /> releases <LatexRenderer
+            expression="R"
+          /> as-is.
+        </p>
+        <p class="text-gray-700 leading-relaxed text-justify">
+          <span class="mx-4"></span>Verification uses only public values <LatexRenderer
+            expression="(\\mathsf{pk},\\sigma_R,h_{\\Phi_X},h_{\\Phi_Y},\\pi)"
+          /> with <LatexRenderer expression="(R,\\Phi_Y)" />. The <em>verifier</em>
+          <Step number={7} /> checks <LatexRenderer expression="\\sigma_R" /> under <LatexRenderer expression="\\mathsf{pk}" /> and
+          verifies that <LatexRenderer expression="\\pi" /> attests the transformation from <LatexRenderer expression="\\Phi_X" />
+          to <LatexRenderer expression="\\Phi_Y" /> with commitments <LatexRenderer expression="h_{\\Phi_X}" /> and <LatexRenderer
+            expression="h_{\\Phi_Y}"
+          />. Finally, it <Step number={8} /> runs ISTFT on <LatexRenderer expression="(R,\\Phi_Y)" /> to reconstruct the released
+          signal <LatexRenderer expression="y" /> without accessing <LatexRenderer expression="x" />.
+        </p>
       </div>
     </section>
 
