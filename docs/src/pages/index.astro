@@ -7,6 +7,7 @@ import Step from "../components/Step.astro";
 import LatexRenderer from "../components/LatexRenderer.astro";
 import samplesData from "../data/samples.json";
 import type { Sample } from "../data/types.ts";
+import InfoIcon from "../icons/SolarInfoSquareOutline.astro";
 
 // Type the imported JSON data
 const samples: Sample[] = samplesData as Sample[];
@@ -15,6 +16,11 @@ const samples: Sample[] = samplesData as Sample[];
 let isVerifierLoaded = false;
 
 const selectiveAlgorithms = ["f32", "m377"] as const;
+const algorithmNames = {
+  original: {name: "Original", description: "Original utterance"},
+  f32: {name: "FPP", description: "Floating-point PV-TSM"},
+  m377: {name: "ZK-VSA", description: "Proposed SNARK-friendly PV-TSM"},
+};
 ---
 
 <Layout>
@@ -122,14 +128,14 @@ const selectiveAlgorithms = ["f32", "m377"] as const;
             <thead>
               <tr class="bg-gray-100 border-b border-gray-300">
                 <th rowspan="2" class="px-4 py-3 text-left font-semibold text-gray-800">Transcript</th>
-                <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Original Speech</th>
+                <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Original Utterance</th>
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Semitone</th>
                 <th colspan={selectiveAlgorithms.length} class="px-4 py-3 text-center font-semibold text-gray-800"
-                  >Anonymized Speech</th
+                  >Anonymized Utterance</th
                 >
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">
                   <div class="flex flex-col items-center space-y-2">
-                    <span>Proof (m377)</span>
+                    <span>Proof (ZK-VSA)</span>
                     <button
                       id="load-verifier-btn"
                       class="px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
@@ -142,7 +148,17 @@ const selectiveAlgorithms = ["f32", "m377"] as const;
               <tr class="bg-gray-100 border-b border-gray-300">
                 {
                   selectiveAlgorithms.map((algorithm) => (
-                    <th class="px-2 py-2 text-center font-medium text-gray-700">{algorithm}</th>
+                    <th class="px-2 py-2 text-center font-medium text-gray-700">
+                      <span class="inline-flex items-center">
+                        {algorithmNames[algorithm as keyof typeof algorithmNames].name}
+                        <span class="ml-1 group relative cursor-pointer align-middle">
+                          <InfoIcon class="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                          <span class="absolute left-1/2 -translate-x-1/2 mt-2 w-48 rounded bg-gray-800 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-normal">
+                            {algorithmNames[algorithm as keyof typeof algorithmNames].description}
+                          </span>
+                        </span>
+                      </span>
+                    </th>
                   ))
                 }
               </tr>
