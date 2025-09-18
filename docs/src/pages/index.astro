@@ -23,6 +23,23 @@ const algorithmNames = {
 };
 
 const base = import.meta.env.BASE_URL;
+
+// Duration calculation and formatting functions
+function calculateDuration(frames: number): number {
+  return (frames * 128) / 16000;
+}
+
+function formatDuration(seconds: number): string {
+  if (seconds < 1) {
+    return `${Math.round(seconds * 1000)}ms`;
+  } else if (seconds < 60) {
+    return `${seconds.toFixed(1)}s`;
+  } else {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds.toFixed(1)}s`;
+  }
+}
 ---
 
 <Layout>
@@ -199,7 +216,10 @@ const base = import.meta.env.BASE_URL;
                     <tr class="hover:bg-gray-50 border-b border-gray-200">
                       {semitoneIndex === 0 && (
                         <td rowspan="6" class="px-4 py-3 text-sm text-gray-700 max-w-xs">
-                          {sample.transcript}
+                          <div class="space-y-1">
+                            <div>{sample.transcript}</div>
+                            <div class="text-xs text-gray-500">Duration: {formatDuration(calculateDuration(sample.frames))}</div>
+                          </div>
                         </td>
                       )}
                       {semitoneIndex === 0 && (
