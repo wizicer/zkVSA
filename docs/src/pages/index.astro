@@ -191,7 +191,7 @@ const base = import.meta.env.BASE_URL;
                       {semitoneIndex === 0 && (
                         <td rowspan="6" class="px-4 py-3 text-center">
                           <audio controls class="w-24 h-6">
-                            <source src={`/audio/${sample.name}.wav`} type="audio/wav" />
+                            <source src={`${base}/data/${sample.name}.flac`} type="audio/flac" />
                             Your browser does not support the audio element.
                           </audio>
                         </td>
@@ -200,7 +200,7 @@ const base = import.meta.env.BASE_URL;
                       {selectiveAlgorithms.map((algorithm) => (
                         <td class="px-2 py-3 text-center">
                           <audio controls class="w-24 h-6">
-                            <source src={`/audio/${sample.name}_${algorithm}_${semitone}.flac`} type="audio/flac" />
+                            <source src={`${base}/data/${sample.name}_${algorithm}_${semitone}.flac`} type="audio/flac" />
                             Your browser does not support the audio element.
                           </audio>
                         </td>
