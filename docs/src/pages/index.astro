@@ -1,9 +1,10 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import WorkflowSVG from '../assets/workflow.svg';
-import VerifyButton from '../components/VerifyButton.astro';
-import samplesData from '../data/samples.json';
-import type { Sample } from '../data/types.ts';
+import Layout from "../layouts/Layout.astro";
+import WorkflowSVG from "../assets/workflow.svg";
+import IntroSVG from "../assets/intro.svg";
+import VerifyButton from "../components/VerifyButton.astro";
+import samplesData from "../data/samples.json";
+import type { Sample } from "../data/types.ts";
 
 // Type the imported JSON data
 const samples: Sample[] = samplesData as Sample[];
@@ -19,10 +20,27 @@ const selectiveAlgorithms = ["f32", "m377"] as const;
     <!-- Title and Authors Section -->
     <section class="py-12">
       <div class="max-w-4xl mx-auto px-6 text-center">
-        <h1 class="text-4xl font-bold text-gray-900 mb-6">
-          ZK-VSA: Zero-Knowledge Voice Synthesis Anonymization
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">
+          ZK-VSA: ZERO-KNOWLEDGE VERIFIABLE SPEAKER ANONYMIZATION LEVERAGING PHASE VOCODER WITH TIME-SCALE MODIFICATION
         </h1>
-        <p class="text-lg text-gray-700">John Doe, Jane Smith, Bob Johnson</p>
+        <div class="mt-4 text-base text-gray-800">
+          <div class="italic text-lg">
+            Shuang Liang<sup>1</sup>, Yang Hua<sup>2</sup>, Peishen Yan<sup>1</sup>, Linshan Jiang<sup>3</sup>, Tao Song<sup
+              >1,*</sup
+            >, Bin Yao<sup>1,*</sup>, Haibing Guan<sup>1</sup>
+          </div>
+          <div class="mt-4 text-sm text-gray-700">
+            <div><sup>1</sup> School of Computer Science, Shanghai Jiao Tong University, Shanghai, China</div>
+            <div>
+              <sup>2</sup> School of Electronics, Electrical Engineering and Computer Science, Queen's University Belfast, Belfast,
+              United Kingdom
+            </div>
+            <div><sup>3</sup> Institute of Data Science, National University of Singapore, Singapore, Singapore</div>
+          </div>
+          <!-- <div class="mt-2 text-sm text-gray-600 italic">
+            * Corresponding author: Tao Song (<a href="mailto:songt333@sjtu.edu.cn">songt333@sjtu.edu.cn</a>), Bin Yao (<a href="mailto:yaobin@cs.sjtu.edu.cn">yaobin@cs.sjtu.edu.cn</a>)
+          </div> -->
+        </div>
       </div>
     </section>
 
@@ -30,31 +48,33 @@ const selectiveAlgorithms = ["f32", "m377"] as const;
     <section class="py-8">
       <div class="max-w-4xl mx-auto px-6">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Abstract</h2>
-        <p class="text-gray-700 leading-relaxed">
-          This paper presents <strong>ZK-VSA</strong>, a novel approach to voice synthesis anonymization using zero-knowledge proofs. 
-          Our system enables the generation of anonymized speech while maintaining privacy guarantees through 
-          cryptographic proofs. The proposed method demonstrates significant improvements in both privacy preservation 
-          and computational efficiency compared to existing approaches. We evaluate our system on multiple datasets 
-          and show that it achieves state-of-the-art performance in voice anonymization tasks.
+        <p class="text-gray-700 leading-relaxed text-justify">
+          Speaker anonymization protects against speaker identity inference, yet third parties cannot verify that released speech
+          is authenticated and anonymized as predefined without revealing the original. We propose <em
+            >Verifiable Speaker Anonymization (VSA)</em
+          >, a paradigm that enables public verification that a predefined anonymization has been applied while the original
+          remains hidden. We instantiate this paradigm as <em>ZK-VSA</em> using zero-knowledge succinct non-interactive arguments of
+          knowledge (ZK-SNARKs): we encode phase vocoder with time-scale modification (PV-TSM) as arithmetic constraints suitable for
+          succinct proofs, complemented by SNARK-friendly phase handling, and integrate cryptographic commitments with digital signatures
+          for authentication. We evaluate ZK-VSA on LibriSpeech, using automatic speech recognition (ASR) for intelligibility and automatic
+          speaker verification (ASV) for anonymity. Our proof-constrained anonymization closely matches floating-point PV-TSM, while
+          proofs add only a slight overhead and verify in milliseconds. These results demonstrate the practicality of VSA and open
+          a path to proof-based guarantees for broader speech transformations.
         </p>
+        <div class="flex justify-center">
+          <IntroSVG class="max-w-full h-auto" />
+        </div>
       </div>
     </section>
 
     <!-- System Model Section -->
     <section class="py-8">
       <div class="max-w-4xl mx-auto px-6">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-6">System Model</h2>
-          <div class="flex justify-center">
-            <WorkflowSVG class="max-w-full h-auto" />
-          </div>
-        <p class="text-gray-700 leading-relaxed">
-          The system model illustrates our proposed ZK-VSA architecture, which consists of three main components: 
-          the voice anonymization module, the zero-knowledge proof generation system, and the verification framework. 
-          The anonymization module processes input speech using multiple algorithms (f32, m32, m377) across different 
-          semitone variations, while the proof system generates cryptographic proofs to ensure the integrity and 
-          privacy of the anonymization process. The verification framework allows users to verify the authenticity 
-          of anonymized speech without revealing the original content or the anonymization parameters.
-        </p>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">System Workflow</h2>
+        <div class="flex justify-center">
+          <WorkflowSVG class="max-w-full h-auto" />
+        </div>
+        <p class="text-gray-700 leading-relaxed"></p>
       </div>
     </section>
 
@@ -69,62 +89,71 @@ const selectiveAlgorithms = ["f32", "m377"] as const;
                 <th rowspan="2" class="px-4 py-3 text-left font-semibold text-gray-800">Transcript</th>
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Original Speech</th>
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">Semitone</th>
-                <th colspan={selectiveAlgorithms.length} class="px-4 py-3 text-center font-semibold text-gray-800">Anonymized Speech</th>
+                <th colspan={selectiveAlgorithms.length} class="px-4 py-3 text-center font-semibold text-gray-800"
+                  >Anonymized Speech</th
+                >
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">
                   <div class="flex flex-col items-center space-y-2">
                     <span>Proof (m377)</span>
-                    <button id="load-verifier-btn" 
-                            class="px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors">
+                    <button
+                      id="load-verifier-btn"
+                      class="px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
+                    >
                       Load Verifier
                     </button>
                   </div>
                 </th>
               </tr>
               <tr class="bg-gray-100 border-b border-gray-300">
-                {selectiveAlgorithms.map((algorithm) => (
-                  <th class="px-2 py-2 text-center font-medium text-gray-700">{algorithm}</th>
-                ))}
+                {
+                  selectiveAlgorithms.map((algorithm) => (
+                    <th class="px-2 py-2 text-center font-medium text-gray-700">{algorithm}</th>
+                  ))
+                }
               </tr>
             </thead>
             <tbody>
-              {samples.map((sample: Sample, sampleIndex: number) => (
-                (["3", "2", "1", "-1", "-2", "-3"] as const).map((semitone, semitoneIndex: number) => (
-                  <tr class="hover:bg-gray-50 border-b border-gray-200">
-                    {semitoneIndex === 0 && (
-                      <td rowspan="6" class="px-4 py-3 text-sm text-gray-700 max-w-xs">
-                        {sample.transcript}
+              {
+                samples.map((sample: Sample, sampleIndex: number) =>
+                  (["3", "2", "1", "-1", "-2", "-3"] as const).map((semitone, semitoneIndex: number) => (
+                    <tr class="hover:bg-gray-50 border-b border-gray-200">
+                      {semitoneIndex === 0 && (
+                        <td rowspan="6" class="px-4 py-3 text-sm text-gray-700 max-w-xs">
+                          {sample.transcript}
+                        </td>
+                      )}
+                      {semitoneIndex === 0 && (
+                        <td rowspan="6" class="px-4 py-3 text-center">
+                          <audio controls class="w-24 h-6">
+                            <source src={`/audio/${sample.originalSpeech}`} type="audio/wav" />
+                            Your browser does not support the audio element.
+                          </audio>
+                        </td>
+                      )}
+                      <td class="px-4 py-3 text-center font-medium text-gray-800">{semitone}</td>
+                      {selectiveAlgorithms.map((algorithm) => (
+                        <td class="px-2 py-3 text-center">
+                          <audio controls class="w-24 h-6">
+                            <source
+                              src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech][algorithm as keyof (typeof sample.anonymizedSpeech)[typeof semitone]]}`}
+                              type="audio/wav"
+                            />
+                            Your browser does not support the audio element.
+                          </audio>
+                        </td>
+                      ))}
+                      <td class="px-4 py-3 text-center">
+                        <VerifyButton
+                          proofId={`sample${sampleIndex + 1}_${semitone}_m377`}
+                          downloadUrl={`/proofs/sample${sampleIndex + 1}_${semitone}_m377_proof.bin`}
+                          fileSize={sample.proof[semitone as keyof typeof sample.proof].size}
+                          disabled={!isVerifierLoaded}
+                        />
                       </td>
-                    )}
-                    {semitoneIndex === 0 && (
-                      <td rowspan="6" class="px-4 py-3 text-center">
-                        <audio controls class="w-24 h-6">
-                          <source src={`/audio/${sample.originalSpeech}`} type="audio/wav" />
-                          Your browser does not support the audio element.
-                        </audio>
-                      </td>
-                    )}
-                    <td class="px-4 py-3 text-center font-medium text-gray-800">
-                      {semitone}
-                    </td>
-                    {selectiveAlgorithms.map((algorithm) => (
-                      <td class="px-2 py-3 text-center">
-                        <audio controls class="w-24 h-6">
-                          <source src={`/audio/${sample.anonymizedSpeech[semitone as keyof typeof sample.anonymizedSpeech][algorithm as keyof typeof sample.anonymizedSpeech[typeof semitone]]}`} type="audio/wav" />
-                          Your browser does not support the audio element.
-                        </audio>
-                      </td>
-                    ))}
-                    <td class="px-4 py-3 text-center">
-                      <VerifyButton 
-                        proofId={`sample${sampleIndex + 1}_${semitone}_m377`}
-                        downloadUrl={`/proofs/sample${sampleIndex + 1}_${semitone}_m377_proof.bin`}
-                        fileSize={sample.proof[semitone as keyof typeof sample.proof].size}
-                        disabled={!isVerifierLoaded}
-                      />
-                    </td>
-                  </tr>
-                ))
-              ))}
+                    </tr>
+                  ))
+                )
+              }
             </tbody>
           </table>
         </div>
@@ -142,10 +171,10 @@ const selectiveAlgorithms = ["f32", "m377"] as const;
 </style>
 
 <script>
-  import { showNotification } from '../utils/notifications.ts';
+  import { showNotification } from "../utils/notifications.ts";
 
   // Import type declarations
-  import '../types/wasm.d.ts';
+  import "../types/wasm.d.ts";
 
   // Global verifier state
   let isVerifierLoaded = false;
@@ -153,68 +182,67 @@ const selectiveAlgorithms = ["f32", "m377"] as const;
 
   // Load verifier function
   async function loadVerifier() {
-    const loadBtn = document.getElementById('load-verifier-btn') as HTMLButtonElement;
+    const loadBtn = document.getElementById("load-verifier-btn") as HTMLButtonElement;
     if (!loadBtn) return;
 
     // Show loading state
-    loadBtn.textContent = 'Loading...';
+    loadBtn.textContent = "Loading...";
     loadBtn.disabled = true;
-    loadBtn.classList.remove('bg-orange-600', 'hover:bg-orange-700');
-    loadBtn.classList.add('bg-orange-500');
+    loadBtn.classList.remove("bg-orange-600", "hover:bg-orange-700");
+    loadBtn.classList.add("bg-orange-500");
 
     try {
       // Load the WASM module
       const go = new (window as any).Go();
       const base = import.meta.env.BASE_URL;
       const result = await WebAssembly.instantiateStreaming(fetch(base + "/wasm/main.wasm"), go.importObject);
-      
+
       // Run the Go program
       go.run(result.instance);
-      
+
       // Check if functions are available
-      if (typeof window.verifyProof === 'function') {
+      if (typeof window.verifyProof === "function") {
         // Mark verifier as loaded
         isVerifierLoaded = true;
         wasmModule = result.instance;
-        
+
         // Update button state
-        loadBtn.textContent = '✓ Verifier Loaded';
-        loadBtn.classList.remove('bg-orange-500');
-        loadBtn.classList.add('bg-green-600');
-        
+        loadBtn.textContent = "✓ Verifier Loaded";
+        loadBtn.classList.remove("bg-orange-500");
+        loadBtn.classList.add("bg-green-600");
+
         // Enable all verify buttons
-        const verifyButtons = document.querySelectorAll('[data-verify-button]') as NodeListOf<HTMLButtonElement>;
-        verifyButtons.forEach(button => {
+        const verifyButtons = document.querySelectorAll("[data-verify-button]") as NodeListOf<HTMLButtonElement>;
+        verifyButtons.forEach((button) => {
           button.disabled = false;
-          button.classList.remove('bg-gray-400', 'cursor-not-allowed');
-          button.classList.add('bg-blue-600', 'hover:bg-blue-700');
-          button.title = '';
+          button.classList.remove("bg-gray-400", "cursor-not-allowed");
+          button.classList.add("bg-blue-600", "hover:bg-blue-700");
+          button.title = "";
         });
 
         // Show success notification
-        showNotification('Verifier loaded successfully! You can now verify proofs.', 'success');
+        showNotification("Verifier loaded successfully! You can now verify proofs.", "success");
       } else {
-        throw new Error('Required functions not found in WASM module');
+        throw new Error("Required functions not found in WASM module");
       }
-      
     } catch (error) {
-      console.error('Failed to load WASM module:', error);
-      
+      console.error("Failed to load WASM module:", error);
+
       // Handle error
-      loadBtn.textContent = 'Load Verifier';
+      loadBtn.textContent = "Load Verifier";
       loadBtn.disabled = false;
-      loadBtn.classList.remove('bg-orange-500');
-      loadBtn.classList.add('bg-orange-600', 'hover:bg-orange-700');
-      
-      showNotification('Failed to load verifier. Please try again.', 'error');
+      loadBtn.classList.remove("bg-orange-500");
+      loadBtn.classList.add("bg-orange-600", "hover:bg-orange-700");
+
+      showNotification("Failed to load verifier. Please try again.", "error");
     }
   }
 
   // Initialize on page load
-  document.addEventListener('DOMContentLoaded', () => {
-    const loadBtn = document.getElementById('load-verifier-btn');
+  document.addEventListener("DOMContentLoaded", () => {
+    const loadBtn = document.getElementById("load-verifier-btn");
     if (loadBtn) {
-      loadBtn.addEventListener('click', loadVerifier);
+      loadBtn.addEventListener("click", loadVerifier);
     }
   });
 </script>
