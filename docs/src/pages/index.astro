@@ -69,9 +69,14 @@ const algorithmNames = {
           proofs add only a slight overhead and verify in milliseconds. These results demonstrate the practicality of VSA and open
           a path to proof-based guarantees for broader speech transformations.
         </p>
-        <div class="flex justify-center">
-          <IntroSVG class="max-w-full h-auto" />
-        </div>
+        <figure class="flex flex-col items-center my-8">
+          <div class="w-full flex justify-center">
+            <IntroSVG class="max-w-2xl w-full h-auto" />
+          </div>
+          <figcaption class="mt-4 text-center text-sm text-gray-600 max-w-2xl">
+            Fig.1: Scenario of <em>verifiable speaker anonymization</em> (VSA). A trusted device records and signs speech signal; the system outputs an anonymized signal and proof for verification, resisting: (a) <em>inversion attacks</em>—recovering the original signal, and (b) <em>re-identification attacks</em>—inferring the speaker's identity.
+          </figcaption>
+        </figure>
       </div>
     </section>
 
@@ -79,11 +84,16 @@ const algorithmNames = {
     <section class="py-8">
       <div class="max-w-4xl mx-auto px-6">
         <h2 class="text-2xl font-semibold text-gray-800 mb-6">System Workflow</h2>
-        <div class="flex justify-center">
-          <WorkflowSVG class="max-w-full h-auto" />
-        </div>
-        <p class="text-gray-700 leading-relaxed text-justify">
-          As illustrated in the Figure, before recording, a <em>trusted device</em>
+        <figure class="flex flex-col items-center">
+          <div class="flex justify-center w-full">
+            <WorkflowSVG class="max-w-lg w-full h-auto" />
+          </div>
+          <figcaption class="mt-4 text-center text-sm text-gray-600 max-w-2xl">
+            <strong>Fig.2:</strong> End-to-end workflow from trusted capture to verifiable anonymized release: device-signed STFT commitments, PV-TSM on phase, a proof bound to those commitments, and public verification with ISTFT reconstruction.
+          </figcaption>
+        </figure>
+        <p class="text-gray-700 leading-relaxed text-justify mt-4">
+          As illustrated in the Fig.2, before recording, a <em>trusted device</em>
           <Step number={1} /> generates a keypair <LatexRenderer expression="(\\mathsf{sk},\\mathsf{pk})" />. It then records the
           input signal <LatexRenderer expression="x" />, <Step number={2} /> computes the STFT to obtain magnitude <LatexRenderer
             expression="R"
