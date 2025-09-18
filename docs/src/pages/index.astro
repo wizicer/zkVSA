@@ -151,12 +151,21 @@ const base = import.meta.env.BASE_URL;
                 <th rowspan="2" class="px-4 py-3 text-center font-semibold text-gray-800">
                   <div class="flex flex-col items-center space-y-2">
                     <span>Proof (ZK-VSA)<sup>1</sup></span>
-                    <button
-                      id="load-verifier-btn"
-                      class="px-3 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
-                    >
-                      Load Verifier
-                    </button>
+                    <div class="inline-flex items-center">
+                      <span class="ml-1 group relative cursor-pointer align-middle">
+                        <button
+                          id="load-verifier-btn"
+                          class="px-3 py-1 bg-orange-400 text-white text-xs rounded hover:bg-orange-600 transition-colors"
+                        >
+                          Load Verifier
+                        </button>
+                        <span
+                          class="absolute left-1/2 -translate-x-1/2 translate-y-6 mt-2 w-48 rounded bg-gray-800 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-normal"
+                        >
+                          Due to the verifier's size (~3MB), on-demand loading is employed to reduce unnecessary bandwidth.
+                        </span>
+                      </span>
+                    </div>
                   </div>
                 </th>
               </tr>
