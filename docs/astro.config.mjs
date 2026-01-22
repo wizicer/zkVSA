@@ -5,8 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://wizicer.github.io/zkVSA",
-  base: "/zkVSA",
+  site: "https://zkvsa.plonk.pro/",
+  base: "/",
   vite: {
     plugins: [tailwindcss()],
   },
