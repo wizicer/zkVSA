@@ -22,7 +22,7 @@ const algorithmNames = {
   f377: { name: "ZK-VSA", description: "Proposed SNARK-friendly PV-TSM" },
 };
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL;
 
 // Duration calculation and formatting functions
 function calculateDuration(frames: number): number {
@@ -352,7 +352,7 @@ function formatDuration(seconds: number): string {
 
 <script is:inline>
   const script = document.createElement("script");
-  script.src = "/zkVSA/wasm/wasm_exec.js";
+  script.src = "/wasm/wasm_exec.js";
   script.async = true;
   document.head.appendChild(script);
 </script>
