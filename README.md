@@ -19,8 +19,8 @@ zkAudio/
 ├── asr/              # Python: ASR evaluation (Whisper, Wav2Vec2, XLSR-53)
 ├── asv/              # Python: ASV evaluation (SpeechBrain)
 ├── corpus/           # LibriSpeech test data download and preparation
-- docs
-- go-wasm-verifier
+├── docs/             # Astro: project landing page & in-browser proof verifier
+└── go-wasm-verifier/ # Go→WASM: Groth16 proof verification module for the browser
 ```
 
 ## Components
@@ -86,6 +86,31 @@ Scripts to download and prepare the LibriSpeech test corpus.
 cd corpus
 bash download_librispeech.sh
 cd librispeech && bash flatten_librispeech.sh
+```
+
+### docs (Astro)
+
+Project landing page and in-browser ZK proof verifier, built with [Astro](https://astro.build/) and Tailwind CSS. The site loads the WASM verifier from `go-wasm-verifier` to let visitors verify Groth16 proofs entirely client-side.
+
+**Prerequisites:** Node.js 18+
+
+```bash
+cd docs
+npm install
+npm run dev      # local dev server at localhost:4321
+npm run build    # production build to ./dist/
+```
+
+### go-wasm-verifier (Go → WebAssembly)
+
+Compiles a Groth16 proof verifier (gnark, BLS12-377) to WebAssembly so that ZK proofs can be verified directly in the browser without a server.
+
+**Prerequisites:** Go 1.24+
+
+```bash
+cd go-wasm-verifier
+bash build.sh
+# Outputs main.wasm and wasm_exec.js into docs/public/wasm/
 ```
 
 ## Workflow
