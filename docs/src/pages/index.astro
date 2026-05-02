@@ -59,7 +59,7 @@ function formatDuration(seconds: number): string {
             >
           </div>
         </div>
-        <div class="flex justify-center mb-6">
+        <div class="flex justify-center gap-3 mb-6 flex-wrap">
           <a
             href="https://ieeexplore.ieee.org/document/11462079/"
             target="_blank"
@@ -68,6 +68,16 @@ function formatDuration(seconds: number): string {
           >
             <span aria-hidden="true">📄</span>
             <span>Read Published Paper (IEEE Xplore)</span>
+          </a>
+          <a
+            href="https://github.com/wizicer/zkVSA"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-orange-300 hover:text-orange-700"
+            title="The complete system — including the prover, verifier, evaluation scripts, and test suite — is fully open-sourced"
+          >
+            <span aria-hidden="true">💻</span>
+            <span>Source Code (GitHub)</span>
           </a>
         </div>
         <h1 class="text-2xl font-bold text-gray-900 mb-6">
@@ -279,7 +289,7 @@ function formatDuration(seconds: number): string {
             1. The verifier implementation is available at <a
               href="https://github.com/wizicer/zkVSA/tree/main/go-wasm-verifier"
               target="_blank"
-              class="underline text-gray-400">Github</a
+              class="underline text-gray-400">GitHub</a
             >.
           </p>
         </div>
