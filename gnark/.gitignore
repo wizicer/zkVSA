@@ -1,0 +1,4 @@
+target/
+proof_data.json
+latex_output.txt
+benchmark_results.csv
