@@ -8,6 +8,12 @@ This is the official implementation of the paper:
 >
 > *ICASSP 2026 — IEEE International Conference on Acoustics, Speech and Signal Processing*
 
+
+<p align="center">
+  <a href="https://ieeexplore.ieee.org/document/11462079/"><img src="https://img.shields.io/badge/Paper-IEEE%20Xplore-blue" alt="Paper" /></a>
+  <a href="http://zkvsa.plonk.pro/"><img src="https://img.shields.io/badge/Demo-Live-brightgreen" alt="Live Demo" /></a>
+</p>
+
 We propose Verifiable Speaker Anonymization (VSA), a paradigm that enables public verification that a predefined anonymization has been applied while the original speech remains hidden. We instantiate this paradigm as ZK-VSA using ZK-SNARKs: we encode phase vocoder with time-scale modification (PV-TSM) as arithmetic constraints over BLS12-377 finite field, complemented by SNARK-friendly phase handling, and integrate cryptographic commitments with digital signatures for authentication.
 
 ## Repository Structure
